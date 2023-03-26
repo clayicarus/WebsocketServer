@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 link_directories(lib)
 include_directories(include)
-include_directories(src)
 
 find_package(cpr CONFIG REQUIRED)
 

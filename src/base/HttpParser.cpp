@@ -9,13 +9,13 @@
 size_t HttpParser::parseOne(std::string_view one_request)
 {
     const auto doubleEOL = std::string(EOL) + EOL;
-    auto e = one_request.find_first_of(std::string(EOL) + doubleEOL);
-    if(e == std::string::npos) {
+    auto poz = one_request.find(doubleEOL);
+    if(poz == std::string::npos) {
         return 0;
     }
     // split message
     std::vector<std::string> lines;
-    if(StringExtra::splitString(one_request.substr(0, e), EOL, lines) < 2) {
+    if(StringExtra::splitString(one_request.substr(0, poz), EOL, lines) < 2) {
         return 0;
     }
     // trim all lines
@@ -40,7 +40,7 @@ size_t HttpParser::parseOne(std::string_view one_request)
         param_.emplace(key, value);
     }
 
-    return e + doubleEOL.size();
+    return poz + doubleEOL.size();
 }
 
 std::string_view HttpParser::getParam(const std::string &key) const

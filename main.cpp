@@ -1,14 +1,22 @@
 #include "EchoServer.h"
 #include "muduo/net/EventLoop.h"
-#include "muduo/base/Logging.h"
+#include "WebSocketServer/WebsocketServer.h"
+
 using namespace muduo::net;
 
-int main() {
-    LOG_INFO << "pid = " << getpid();
+int main()
+{
+    // Logger::setLogLevel(Logger::DEBUG);
     EventLoop loop;
-    InetAddress addr(6011);
-    EchoServer server(&loop, addr);
-    server.start();
+    EchoServer echoServer(&loop, InetAddress(6011));
+    WebsocketServer websocketServer(&loop, InetAddress(9000));
+    websocketServer.setMessageCallback([]
+        (const auto &conn, const auto &msg, auto time){
+            printf("%s", msg.c_str());
+        });
+
+    echoServer.start();
+    websocketServer.start();
     loop.loop();
 
     return 0;

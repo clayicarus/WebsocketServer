@@ -19,6 +19,3 @@ set(UNOFFICIAL_LIB cpr::cpr muduo_net muduo_base pthread)
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURCE})
 target_link_libraries(${PROJECT_NAME} ${UNOFFICIAL_LIB})
-
-add_executable(test test.cpp ${SOURCE})
-target_link_libraries(test ${UNOFFICIAL_LIB})

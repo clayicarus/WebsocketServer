@@ -10,11 +10,17 @@
 
 class WebsocketServer {
 public:
+    enum class CONNECTION_STATUS {
+        WAIT_HANDSHAKE, ESTABLISHED
+    };
     WebsocketServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &addr)
         : server_(loop, addr, "WebsocketServer")
     {
         server_.setConnectionCallback([this](const auto &conn){
             WebsocketServer::onConnect(conn);
+        });
+        server_.setMessageCallback([this](const auto &conn, auto *buf, auto time){
+            WebsocketServer::onMessage(conn, buf, time);
         });
     }
     void start()
@@ -23,7 +29,10 @@ public:
         server_.start();
     }
 private:
+    void onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf, muduo::Timestamp time);
     void onConnect(const muduo::net::TcpConnectionPtr &conn);
+    void handleHandshake();
+    void handle
 
     muduo::net::TcpServer server_;
 };

@@ -6,28 +6,29 @@
 #include "HttpParser.h"
 #include "StringExtra.h"
 
-HttpParser::ParaMap::size_type HttpParser::parse()
+size_t HttpParser::parseOne(std::string_view one_request)
 {
-    auto e = message_.find(std::string(EOL) + EOL);
+    const auto doubleEOL = std::string(EOL) + EOL;
+    auto e = one_request.find_first_of(std::string(EOL) + doubleEOL);
     if(e == std::string::npos) {
-        return -1;
+        return 0;
     }
     // split message
     std::vector<std::string> lines;
-    if(StringExtra::splitString(message_.substr(0, e), EOL, lines) < 2) {
-        return -1;
+    if(StringExtra::splitString(one_request.substr(0, e), EOL, lines) < 2) {
+        return 0;
     }
     // trim all lines
     for(auto &i : lines) { StringExtra::trim(i); }
-    // parse request head
+    // parse one request head
     std::vector<std::string> requestParams;
     if(StringExtra::splitString(lines.front(), SP, requestParams) < 3) {
-        return -1;
+        return 0;
     }
     method_ = StringExtra::trim(requestParams[0]);
     uri_ = StringExtra::trim(requestParams[1]);
     version_ = StringExtra::trim(requestParams[2]);
-    // parse headers to params
+    // parseOne headers to params
     for(int i = 1; i < lines.size(); ++i) {
         const auto &l = lines[i];
         auto pos = l.find_first_of(COLON);
@@ -39,5 +40,12 @@ HttpParser::ParaMap::size_type HttpParser::parse()
         param_.emplace(key, value);
     }
 
-    return param_.size();
+    return e + doubleEOL.size();
+}
+
+std::string_view HttpParser::getParam(const std::string &key) const
+{
+    auto p = param_.find(key);
+    if(p != param_.end()) return p->second;
+    else return {};
 }

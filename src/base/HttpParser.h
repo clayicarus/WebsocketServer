@@ -13,18 +13,20 @@
 
 class HttpParser {
     typedef std::map<std::string, std::string> ParaMap;
-    static constexpr char EOL[] = "\r\n";
+public:
     static constexpr char SP[] = " ";
     static constexpr char COLON[] = ":";
-public:
-    HttpParser() = default;
-    explicit HttpParser(std::string msg)
-        : message_(std::move(msg))
-    {}
+    static constexpr char EOL[] = "\r\n";
 
-    ParaMap::size_type parse();
-    void setMessage(std::string msg) { message_ = std::move(msg); }
-    [[nodiscard]] std::string_view getParam(const std::string& key) const { return param_.count(key) ? param_.at(key) : ""; }
+    HttpParser() = default;
+
+    // return parse size
+    size_t parseOne(std::string_view one_request);
+    [[nodiscard]] std::string_view getParam(const std::string& key) const;
+    [[nodiscard]] std::string_view getMethod() const { return method_; }
+    [[nodiscard]] std::string_view getUri() const { return uri_; };
+    [[nodiscard]] std::string_view getVersion() const { return version_; }
+    [[nodiscard]] const ParaMap &params() const { return param_; }
 private:
     std::string message_;
     std::string method_;

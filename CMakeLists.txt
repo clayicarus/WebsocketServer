@@ -5,16 +5,15 @@ set(CMAKE_CXX_STANDARD 17)
 
 link_directories(lib)
 include_directories(include)
-include_directories(src)
 
 find_package(cpr CONFIG REQUIRED)
 
 set(SOURCE EchoServer.cpp
-        src/WebSocketServer/WebsocketServer.cpp
-        src/base/HttpParser.cpp
-        src/base/sha1_portable.cpp
-        src/base/base64.cpp
-        src/WebSocketServer/DataFrameCodec.cpp)
+        WebSocketServer/WebsocketServer.cpp
+        base/HttpParser.cpp
+        base/sha1_portable.cpp
+        base/base64.cpp
+        WebSocketServer/DataFrameCodec.cpp)
 set(UNOFFICIAL_LIB cpr::cpr muduo_net muduo_base pthread)
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURCE})

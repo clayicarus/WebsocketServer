@@ -13,14 +13,15 @@ class WebsocketServer {
 public:
     WebsocketServer(const WebsocketServer &) = delete;
     WebsocketServer &operator=(const WebsocketServer&) = delete;
-
+    typedef std::function<void(const muduo::net::TcpConnectionPtr&, const std::string&, muduo::Timestamp)> MessageCallback;
     enum class ConnectionStatus {
         WAIT_HANDSHAKE, ESTABLISHED
     };
     WebsocketServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &addr)
         : server_(loop, addr, "WebsocketServer"),
           codec_([this](const auto &conn, const auto &msg, auto time)
-            { onMessage(conn, msg, time); })
+            { onMessage(conn, msg, time); }),
+          messageCallback_([](const auto &, const auto &, auto){})
     {
         server_.setConnectionCallback([this](const auto &conn)
             { onConnection(conn); });
@@ -32,6 +33,7 @@ public:
         LOG_INFO << server_.name() << " - start";
         server_.start();
     }
+    void setMessageCallback(MessageCallback callback) { messageCallback_ = std::move(callback); }
 private:
     void onData(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf, muduo::Timestamp time);
     void onConnection(const muduo::net::TcpConnectionPtr &conn);
@@ -40,6 +42,7 @@ private:
 
     DataFrameCodec codec_;
     muduo::net::TcpServer server_;
+    MessageCallback messageCallback_;
 };
 
 

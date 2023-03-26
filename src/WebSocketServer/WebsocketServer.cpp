@@ -10,10 +10,10 @@
 void WebsocketServer::onConnection(const muduo::net::TcpConnectionPtr &conn)
 {
     if(conn->connected()) {
-        LOG_INFO << conn->name() << " - " << conn->peerAddress().toIpPort() << " UP";
+        LOG_INFO << conn->name() << " - " << conn->peerAddress().toIpPort() << " is UP";
         conn->setContext(boost::any_cast<ConnectionStatus>(ConnectionStatus::WAIT_HANDSHAKE));
     } else {
-        LOG_INFO << conn->name() << " - " << conn->peerAddress().toIpPort() << " DOWN";
+        LOG_INFO << conn->name() << " - " << conn->peerAddress().toIpPort() << " is DOWN";
     }
 }
 
@@ -39,7 +39,7 @@ void WebsocketServer::onData(const muduo::net::TcpConnectionPtr &conn, muduo::ne
 
 void WebsocketServer::handleHandshake(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf)
 {
-    LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - receive websocket handshake";
+    LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - websocket handshake received";
 
     static constexpr auto WS_MAX_HANDSHAKE_FRAME_SIZE = 1024 * 1000;
     if(buf->readableBytes() > WS_MAX_HANDSHAKE_FRAME_SIZE) {
@@ -92,5 +92,5 @@ WebsocketServer::onMessage(const muduo::net::TcpConnectionPtr &conn, const std::
 {
     LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - "
              << "msg received at " << recvTime.toFormattedString() << " decoded";
-    printf("%s\n", msg.c_str());
+    messageCallback_(conn, msg, muduo::Timestamp::now());
 }

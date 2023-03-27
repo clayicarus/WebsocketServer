@@ -4,8 +4,6 @@
 
 #include "EchoServer.h"
 #include "muduo/base/Logging.h"
-#include "base/HttpParser.h"
-#include "base/StringExtra.h"
 
 using namespace muduo;
 using namespace muduo::net;
@@ -33,6 +31,7 @@ void EchoServer::onMessage(const TcpConnectionPtr &conn, muduo::net::Buffer *buf
     auto msg(buf->retrieveAllAsString());
     LOG_INFO << conn->name() << " echo " << msg.size() << " bytes, "
              << "data received at " << time.toString();
+    LOG_DEBUG << msg;
 
     conn->send(msg);
 }

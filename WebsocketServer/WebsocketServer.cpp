@@ -26,7 +26,7 @@ void WebsocketServer::onData(const muduo::net::TcpConnectionPtr &conn, muduo::ne
             if(buf->readableBytes() == 0)
                 break;
         case ConnectionStatus::ESTABLISHED:
-            LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - "
+            LOG_DEBUG << conn->name() << " " << conn->peerAddress().toIpPort() << " - "
                 << buf->readableBytes() << " bytes received";
             codec_.decodeDataFrame(conn, buf, time);
             break;
@@ -39,7 +39,7 @@ void WebsocketServer::onData(const muduo::net::TcpConnectionPtr &conn, muduo::ne
 
 void WebsocketServer::handleHandshake(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf)
 {
-    LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - websocket handshake received";
+    LOG_DEBUG << conn->name() << " " << conn->peerAddress().toIpPort() << " - websocket handshake received";
 
     static constexpr auto WS_MAX_HANDSHAKE_FRAME_SIZE = 1024 * 1000;
     if(buf->readableBytes() > WS_MAX_HANDSHAKE_FRAME_SIZE) {
@@ -59,7 +59,7 @@ void WebsocketServer::handleHandshake(const muduo::net::TcpConnectionPtr &conn, 
        || parser.getParam("Upgrade") != "websocket"
        || parser.getParam("Sec-WebSocket-Version") != "13"
        || parser.getParam("Sec-WebSocket-Key").empty()) {
-        LOG_WARN << conn->name() << " " << conn->peerAddress().toIpPort() << " - invalid WebSocket request";
+        LOG_WARN << conn->name() << " " << conn->peerAddress().toIpPort() << " - invalid websocket request";
         conn->shutdown();
         return;
     }
@@ -84,13 +84,13 @@ void WebsocketServer::handleHandshake(const muduo::net::TcpConnectionPtr &conn, 
     conn->send(rep);
     conn->setContext(boost::any(ConnectionStatus::ESTABLISHED));
 
-    LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - websocket connection established";
+    LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - websocket connection ESTABLISHED";
 }
 
 void
 WebsocketServer::onMessage(const muduo::net::TcpConnectionPtr &conn, const std::string &msg, muduo::Timestamp recvTime)
 {
-    LOG_INFO << conn->name() << " " << conn->peerAddress().toIpPort() << " - "
+    LOG_DEBUG << conn->name() << " " << conn->peerAddress().toIpPort() << " - "
              << "msg received at " << recvTime.toFormattedString() << " decoded";
     messageCallback_(conn, msg, muduo::Timestamp::now());
 }

@@ -33,3 +33,21 @@ int main()
 
   将返回值打包成数据帧并发送给ws客户端
 
+## 开发日志
+
+- 2023.3.24
+
+  - 开发了 HTTP 请求解析器 HttpParsser 以及字符串处理工具类 StringExtra ，用于处理 Websoket 协议的一次握手。
+
+  - 引入muduo网络库，并且开发了 EchoServer 用于测试 muduo 网络库是否正常运转，以及用于调试 HTTP 请求头的解析功能。
+
+- 2023.3.26
+
+  - 引入了 Base64 等编码库，解决握手过程的编码问题。
+
+  - 定义服务器的两个状态：WAIT_HANDSHAKE、ESTABLISHED，将WAIT_HANDSHAKE状态接收到的数据交给 handleHandshake() 处理；将ESTABLISHED状态接收到的数据交给数据帧解码器 DataFrameCodec::decodeDataFrame处理。
+
+  - 开发DataFrameCodec用于数据帧的解码，解码完成时将回调WebsocketServer中定义的onMessage方法。
+
+
+
